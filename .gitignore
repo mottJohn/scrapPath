@@ -1,0 +1,11 @@
+pathConc_1-1000/
+pathConc_1001-2000/
+pathConc_2001-3000/
+pathConc_3001-4000/
+pathConc_4001-6000/
+chromedriver.exe
+.vscode
+*.csv
+*.xlsx
+GIS/
+cmaqAll/
