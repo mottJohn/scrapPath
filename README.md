@@ -31,4 +31,8 @@ Ref:
 2. Run each .py files in anaconda prompt.
 
 # To-dos
+## Scap
+* Currently, the script use selenium to click the webpage. However, further investigation found that it is actually a form submits to a server. Building a html form as request will be more reliable than clicking webpage, and possibility faster too.
+
+## Heatmap
 * The current script runs very slow since it loops through all the grips 8 times for all the AQOs requirements. Need to think of some smarter way to do it.
