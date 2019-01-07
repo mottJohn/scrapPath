@@ -1,4 +1,5 @@
 from __future__ import division
+from functools import reduce
 
 ##############################
 # USER INPUTS
@@ -27,6 +28,9 @@ path_cmaq = r'C:\Users\CHA82870\OneDrive - Mott MacDonald\Documents\scrapPath\cm
 import time
 start_time = time.time()
 
+from joblib import Parallel, delayed
+import multiprocessing
+
 import pandas as pd
 from pandas import ExcelWriter
 import math
@@ -47,8 +51,8 @@ def get_nlargest(df, n, adj):
         result[cols] = tem
     return result
 
-merge = pd.DataFrame()
-for i in range(1,9):
+#merge = pd.DataFrame()
+def calculate(i):
     pollutants = i
     print(i)
     if pollutants == 1: #TSP
@@ -129,28 +133,36 @@ for i in range(1,9):
         data = data.drop([0,1], axis = 0)
         data = data.apply(pd.to_numeric)
 
+        """
         index = data.index.tolist()
-        re_index = index[-7:] + index[:-7]
-        data = data.reindex(re_index) #move the last 8 rows to the top
-
-        for i in list(range(7)): #set YYYY to be the year in the 9th row
-                data.iloc[i,0] = data.iloc[7,0]
-            
+        re_index = index[-8:] + index[:-8]
+        data = data.reindex(re_index) #move the last 7 rows to the top
+        #data = data.drop(data.index[0:9])
+        print(data)
+        for a in list(range(7)): #set YYYY to be the year in the 9th row
+                data.iloc[a,0] = data.iloc[7,0]
+        
         data = data.reset_index(drop=True)
-        data_24 = data.groupby(np.arange(len(data))//24).mean()
-        data_24.iloc[:,1:] = data_24.iloc[:,1:] + RSP_10_adj
+        """
 
+        data = data[16:-8]
+        data_an = data*factor_annual
+        data_24 = data.groupby(np.arange(len(data))//24).mean()
+        data_24.iloc[:,1:] = data_24.iloc[:,1:]*factor_daily + RSP_10_adj
+
+        """
         data_8 = data.groupby(np.arange(len(data))//8).mean()
         data_8.iloc[:,1:] = data_8.iloc[:,1:]
+        """
+        data_8 = data.rolling(8).mean()
         #print(data_8)
-
 
         lst = []
         lst.append(get_nlargest(data, 1, 0)) #Max Hourly
         lst.append(get_nlargest(data_24, 10,0)) #10th Max Daily
         lst.append(get_nlargest(data_8, 10,0)) #10th Max 8-hour
         lst.append(get_nlargest(data, 19, 0)) #19th Max Hourly
-        lst.append((data.mean() + RSP_an_adj).to_dict()) #annual average
+        lst.append((data_an.mean() + RSP_an_adj).to_dict()) #annual average
 
         summary = pd.DataFrame(lst)
         summary['Index'] = ['Max hourly','10th Max Daily','10th Max 8 hour average','19th Max hourly','Annual average']
@@ -220,16 +232,18 @@ for i in range(1,9):
             output = summary
 
     output = output.sort_values(['i','j'])
-    #output.to_csv('RSP_hourly.csv')
 
-    try:
-        merge = merge.merge(output, on=['i','j'])
-    except:
-        merge = output
+    return output
 
+#merge = merge.apply(pd.to_numeric)
+#merge = merge.sort_values(['i','j'])
+#merge.to_csv('PATH_AQO.csv') 
 
-merge = merge.apply(pd.to_numeric)
-merge = merge.sort_values(['i','j'])
-merge.to_csv('PATH_AQO.csv') 
+num_cores = multiprocessing.cpu_count()
 
+results = Parallel(n_jobs=num_cores)(delayed(calculate)(i) for i in range(2,9))
+
+merge = reduce(lambda x, y: pd.merge(x, y, on = ['i','j']), results)
+merge.to_csv('PATH_AQO_concurrent_fixed.csv')
+#print(merge)
 print("--- %s seconds ---" % (time.time() - start_time))
