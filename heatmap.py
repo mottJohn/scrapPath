@@ -145,11 +145,11 @@ def calculate(i):
         data = data.reset_index(drop=True)
         """
 
-        data = data[16:-8]
+        data = data[17:-7]
         data_an = data*factor_annual
         data_24 = data.groupby(np.arange(len(data))//24).mean()
         data_24.iloc[:,1:] = data_24.iloc[:,1:]*factor_daily + RSP_10_adj
-
+        #print(data)
         """
         data_8 = data.groupby(np.arange(len(data))//8).mean()
         data_8.iloc[:,1:] = data_8.iloc[:,1:]
@@ -235,8 +235,6 @@ def calculate(i):
 
     return output
 
-#merge = merge.apply(pd.to_numeric)
-#merge = merge.sort_values(['i','j'])
 #merge.to_csv('PATH_AQO.csv') 
 
 num_cores = multiprocessing.cpu_count()
@@ -244,6 +242,8 @@ num_cores = multiprocessing.cpu_count()
 results = Parallel(n_jobs=num_cores)(delayed(calculate)(i) for i in range(2,9))
 
 merge = reduce(lambda x, y: pd.merge(x, y, on = ['i','j']), results)
+merge = merge.apply(pd.to_numeric)
+merge = merge.sort_values(['i','j'])
 merge.to_csv('PATH_AQO_concurrent_fixed.csv')
 #print(merge)
 print("--- %s seconds ---" % (time.time() - start_time))
