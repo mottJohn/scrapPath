@@ -15,7 +15,7 @@ The downloading file is .zip. The program will extract the zips for you and dele
 ## Calculate the Polluatants Concentration Per Grid according to AQOs
 heatmap.py
 
-I have reused the code from Aermod to calculate the concentrations of pollutants in each grid according to AQOs requirements. The data will then be plotted as a heatmap in ArcGIS.
+I have reused the code from [Aermod](https://github.com/mottJohn/AERMOD) to calculate the concentrations of pollutants in each grid according to AQOs requirements. The data will then be plotted as a heatmap in ArcGIS.
 
 Ref:
 
@@ -29,3 +29,6 @@ Ref:
 # Getting Start
 1. Just download the whole thing and unzip
 2. Run each .py files in anaconda prompt.
+
+# To-dos
+* The current script runs very slow since it loops through all the grips 8 times for all the AQOs requirements. Need to think of some smarter way to do it.
