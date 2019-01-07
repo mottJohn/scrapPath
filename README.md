@@ -32,7 +32,11 @@ Ref:
 
 # To-dos
 ## Scap
-* Currently, the script use selenium to click the webpage. However, further investigation found that it is actually a form submits to a server. Building a html form as request will be more reliable than clicking webpage, and possibility faster too.
+* Currently, the script use selenium to click the webpage. However, further investigation found that it is actually a form submits to a server. Building a html form as request will be more reliable than clicking webpage, and possibility faster too. (SOLVED: time reduced to 15 mins)
 
 ## Heatmap
-* The current script runs very slow (An hour) since it loops through all the grips 8 times for all the AQOs requirements. Need to think of some smarter way to do it. (SOLVED: time reduced to 15 mins)
+* The current script runs very slow (An hour) since it loops through all the grips 8 times for all the AQOs requirements. Need to think of some smarter way to do it.
+
+#Notes
+* 8 hour average is rolling, but 24 hours averasge is not because we don't know which 8 hours belong to but we know which 24 hours belong to
+* some ambiguity in 0-23 or 1 - 0(24) hour system. The program currently uses 1-0(24) which I am not sure actually. haha.
