@@ -1,6 +1,5 @@
 # About The Project
 ## Path Grid Data Download
-scrapPath_XXX.py
 
 The scripts are used to download [path grid data](https://path.epd.gov.hk/).
 
