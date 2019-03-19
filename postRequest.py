@@ -1,6 +1,9 @@
 import requests
+import grequests
 import zipfile
 import io
+
+async_list = []
 
 for x in list(range(1, 75)):
     for y in list(range(1,75)):
@@ -20,11 +23,13 @@ for x in list(range(1, 75)):
 
         }
 
-        r_met = requests.post("https://path.epd.gov.hk/download.php", data = data_met, verify=False)
-        r_conc = requests.post("https://path.epd.gov.hk/download.php", data = data_conc, verify=False)
+        r_met = grequests.post("https://path.epd.gov.hk/download.php", data = data_met, verify=False)
+        r_conc = grequests.post("https://path.epd.gov.hk/download.php", data = data_conc, verify=False)
+        async_list.append(r_met)
+        async_list.append(r_conc)
 
-        z_met = zipfile.ZipFile(io.BytesIO(r_met.content))
-        z_met.extractall(r"C:\Users\CHA82870\OneDrive - Mott MacDonald\Documents\scrapPath\All Data")
-        
-        z_conc = zipfile.ZipFile(io.BytesIO(r_conc.content))
-        z_conc.extractall(r"C:\Users\CHA82870\OneDrive - Mott MacDonald\Documents\scrapPath\All Data")
+req = grequests.map(async_list)
+
+for response in req:
+    z = zipfile.ZipFile(io.BytesIO(response.content))
+    z.extractall(r"C:\Users\CHA82870\OneDrive - Mott MacDonald\Documents\scrapPath\All Data")
